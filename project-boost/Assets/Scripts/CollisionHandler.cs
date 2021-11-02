@@ -6,9 +6,21 @@ using UnityEngine.SceneManagement;
 public class CollisionHandler : MonoBehaviour
 {
     [SerializeField] float levelLoadDelay = 2f;
+    [SerializeField] AudioClip sucess;
+    [SerializeField] AudioClip crash;
+
+    AudioSource audioSource;
+    bool isTrasitioning = false;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();    
+    }
 
     void OnCollisionEnter(Collision other)
     {
+        if (isTrasitioning) {return;}
+
         switch (other.gameObject.tag)
         {
             case "Friendly" :
@@ -29,7 +41,9 @@ public class CollisionHandler : MonoBehaviour
 
     void StartSuccessSequence()
     {
-        // Todo add SFX upon Crash
+        isTrasitioning = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(sucess);
         // Todo add Particle Effetc upon crash
         GetComponent<Movement>().enabled = false;
         Invoke("LoadNextLevel", levelLoadDelay);
@@ -37,8 +51,10 @@ public class CollisionHandler : MonoBehaviour
 
     void StartCrashSequence()
     {
-        // Todo add SFX upon Crash
-        // Todo add Particle Effetc upon crash
+        isTrasitioning = true;
+        audioSource.Stop();
+        audioSource.PlayOneShot(crash);
+        // Todo add Particle Effetc upon sucess
         GetComponent<Movement>().enabled = false;
         Invoke("ReloadLevel", levelLoadDelay);
     }
