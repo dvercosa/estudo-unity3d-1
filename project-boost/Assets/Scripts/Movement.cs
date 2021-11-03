@@ -10,6 +10,9 @@ public class Movement : MonoBehaviour
     [SerializeField] AudioClip mainEngine;
     Rigidbody rb;
     AudioSource audioSource;
+    [SerializeField] ParticleSystem leftThruster;
+    [SerializeField] ParticleSystem rightThruster;
+    [SerializeField] ParticleSystem booster;
     // Start is called before the first frame update.
     void Start()
     {
@@ -28,28 +31,70 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
-            if (!audioSource.isPlaying) {
-                audioSource.PlayOneShot(mainEngine);
-            }
-            
-        } else {
-            audioSource.Stop();
+            StartThrusting();
         }
-
-        
+        else
+        {
+            StopThrusting();
+        }
     }
 
+    private void StartThrusting()
+    {
+        rb.AddRelativeForce(Vector3.up * mainThrust * Time.deltaTime);
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(mainEngine);
+        }
+        if (!booster.isEmitting)
+        {
+            booster.Play();
+        }
+    }
+    
+        private void StopThrusting()
+    {
+        audioSource.Stop();
+        booster.Stop();
+    }
     void ProcessRotation()
     {
         if (Input.GetKey(KeyCode.A))
         {
-            AplyRotation(rotationThrust);
+            RightThrusting();
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            AplyRotation(-rotationThrust);
+            LeftThrusting();
         }
+        else
+        {
+            StopSideThrusting();
+        }
+    }
+
+    private void LeftThrusting()
+    {
+        AplyRotation(-rotationThrust);
+        if (!leftThruster.isEmitting)
+        {
+            leftThruster.Play();
+        }
+    }
+
+    private void RightThrusting()
+    {
+        AplyRotation(rotationThrust);
+        if (!rightThruster.isEmitting)
+        {
+            rightThruster.Play();
+        }
+    }
+
+    private void StopSideThrusting()
+    {
+        rightThruster.Stop();
+        leftThruster.Stop();
     }
 
     void AplyRotation(float rotationForce)
